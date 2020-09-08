@@ -1,28 +1,34 @@
 package org.wolfpack.assessment.controllers
 
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.crossstore.ChangeSetPersister
 import org.springframework.web.bind.annotation.*
 import org.wolfpack.assessment.Wolf
 import org.wolfpack.assessment.WolfRepository
+import org.wolfpack.assessment.services.WolfService
 
 @RestController
 @RequestMapping("/api/wolf")
-class WolfController(@Autowired private val repository: WolfRepository) {
+class WolfController(@Autowired private val service: WolfService) {
 
     @GetMapping("/")
-    fun findAll() = repository.findAll()
+    fun findAll() = service.getAllWolves()
 
     @GetMapping("/{id}")
     fun findOne(@PathVariable id: String) =
-        repository.findById(id)
+        service.findWolfById(id)
 
     @PostMapping("/")
     fun createWolf(@RequestBody wolf: Wolf) =
-        repository.save(wolf)
+        service.createWolf(wolf)
 
     @PutMapping("/{id}")
-    fun updateWolf(@PathVariable id: String, @RequestBody wolf: Wolf) {
-        val wolf = repository.findById(id)
-    }
+    fun updateWolf(@PathVariable id: String, @RequestBody wolf: Wolf) =
+        service.updateWolf(id, wolf)
+
+    @DeleteMapping("/{id}")
+    fun deleteWolf(@PathVariable id: String) =
+        service.deleteWolf(id)
+
 
 }

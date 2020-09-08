@@ -1,28 +1,28 @@
 package org.wolfpack.assessment.controllers
 
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.ui.Model
 import org.springframework.web.bind.annotation.*
-import org.wolfpack.assessment.PackRepository
+import org.wolfpack.assessment.Pack
+import org.wolfpack.assessment.services.PackService
 
 @RestController
 @RequestMapping("/api/pack")
-class PackController(@Autowired private val repository: PackRepository) {
+class PackController(@Autowired private val service: PackService) {
 
     @GetMapping("/")
-    fun findAll() = repository.findAll()
+    fun findAll() = service.findAllPacks()
 
     @GetMapping("/{id}")
     fun findOne(@PathVariable id: String) =
-        repository.findById(id)
+        service.findPackById(id)
 
     @GetMapping("/{id}/wolves")
     fun getWolves(@PathVariable id: String) =
-        repository.findById(id).map { it.wolves }
+        service.findWolvesForId(id)
 
     @PutMapping("/")
-    fun createPack(model: Model) {
-
+    fun createPack(@RequestBody pack: Pack) {
+        service.createPack(pack)
     }
 
 }
