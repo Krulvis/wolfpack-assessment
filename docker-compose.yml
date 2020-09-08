@@ -1,0 +1,20 @@
+version: '3'
+services:
+  wp-mongo:
+    container_name: wp-mongo
+    image: mongo:3.6
+    restart: always
+    environment:
+      - MONGO_DATA_DIR=/data/db
+      - MONGO_LOG_DIR=/dev/null
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=secret
+      - MONGO_INITDB_DATABASE=wp_db
+    ports:
+      - 27017:27017
+    volumes:
+      - mongo-data:/data/db
+    command: mongod --smallfiles --logpath=/dev/null
+
+volumes:
+  mongo-data:
