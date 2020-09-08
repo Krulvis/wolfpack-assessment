@@ -22,10 +22,14 @@ dependencies {
     implementation(kotlin("stdlib"))
     implementation("com.thedeanda", "lorem", "2.1")
     implementation("org.jetbrains.kotlin", "kotlin-reflect")
+    implementation("com.fasterxml.jackson.module", "jackson-module-kotlin")
     implementation("org.springframework.boot", "spring-boot-starter-test")
     implementation("org.springframework.boot", "spring-boot-starter-web")
     implementation("org.springframework.boot", "spring-boot-starter-actuator")
     implementation("org.springframework.boot", "spring-boot-starter-data-mongodb")
+    implementation("io.springfox", "springfox-swagger2", "3.0.0")
+    implementation("io.springfox", "springfox-boot-starter", "3.0.0")
+    implementation("io.springfox", "springfox-swagger-ui", "3.0.0")
 }
 
 allOpen {
