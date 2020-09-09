@@ -18,3 +18,6 @@ class ErrorHandler {
     @ResponseStatus(HttpStatus.CONFLICT)
     fun handleError(e: IllegalArgumentException) = e.message
 }
+
+@ResponseStatus
+class ResourceNotFoundException(message: String) : RuntimeException(message)

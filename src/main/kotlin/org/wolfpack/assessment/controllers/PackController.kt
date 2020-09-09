@@ -20,7 +20,7 @@ class PackController(@Autowired private val service: PackService) {
     fun getWolves(@PathVariable id: String) =
         service.findWolvesForId(id)
 
-    @PutMapping("/")
+    @PostMapping("/")
     fun createPack(@RequestBody pack: Pack) {
         service.createPack(pack)
     }
