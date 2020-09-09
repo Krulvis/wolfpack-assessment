@@ -4,9 +4,9 @@ import org.springframework.boot.ApplicationRunner
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.data.geo.Point
-import org.wolfpack.assessment.Pack
+import org.wolfpack.assessment.models.Pack
 import org.wolfpack.assessment.PackRepository
-import org.wolfpack.assessment.Wolf
+import org.wolfpack.assessment.models.Wolf
 import org.wolfpack.assessment.WolfRepository
 import java.time.LocalDate
 

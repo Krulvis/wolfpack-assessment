@@ -1,4 +1,4 @@
-package org.wolfpack.assessment.controllers
+package org.wolfpack.assessment.errors
 
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.ExceptionHandler
@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 class ErrorHandler {
 
-    @RequestMapping("/raiseError")
+    @RequestMapping("/testError")
     fun raiseError() {
         throw IllegalArgumentException("This shouldn't have happened")
     }
@@ -17,7 +17,11 @@ class ErrorHandler {
     @ExceptionHandler(IllegalArgumentException::class)
     @ResponseStatus(HttpStatus.CONFLICT)
     fun handleError(e: IllegalArgumentException) = e.message
+
+    @ExceptionHandler(NotImplementedError::class)
+    @ResponseStatus(HttpStatus.NOT_IMPLEMENTED)
+    fun handleError(e: NotImplementedError) = e.message
 }
 
 @ResponseStatus
-class ResourceNotFoundException(message: String) : RuntimeException(message)
+class ResourceNotFoundException(message: String) : Exception(message)

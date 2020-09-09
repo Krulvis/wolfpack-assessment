@@ -1,19 +1,17 @@
 package org.wolfpack.assessment.services
 
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.domain.Sort
 import org.springframework.data.geo.Point
 import org.springframework.data.mongodb.core.MongoTemplate
 import org.springframework.data.mongodb.core.query.Criteria
 import org.springframework.data.mongodb.core.query.Query
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import org.wolfpack.assessment.Wolf
+import org.wolfpack.assessment.models.Wolf
 import org.wolfpack.assessment.WolfRepository
-import org.wolfpack.assessment.controllers.ResourceNotFoundException
+import org.wolfpack.assessment.errors.ResourceNotFoundException
 
-/**
- * Om ruimte over te laten voor business logic maak ik gebruik van services
- */
 interface WolfService {
 
     fun getAllWolves(): Iterable<Wolf>
@@ -29,6 +27,8 @@ interface WolfService {
     fun updateLocationForId(id: String, point: Point)
 
     fun deleteWolf(id: String)
+
+    fun deleteAllWolves()
 }
 
 @Service
@@ -39,7 +39,7 @@ class WolfServiceImpl(
 ) : WolfService {
 
     override fun getAllWolves(): Iterable<Wolf> {
-        return repository.findAll()
+        return repository.findAll(Sort.by(Sort.Direction.ASC, "name"))
     }
 
     override fun createWolf(wolf: Wolf) {
@@ -57,7 +57,11 @@ class WolfServiceImpl(
     }
 
     override fun findWolfById(id: String): Wolf {
-        return repository.findById(id).orElseThrow { ResourceNotFoundException("Wolf not found for id: $id") }
+        return repository.findById(id).orElseThrow {
+            ResourceNotFoundException(
+                "Wolf not found for id: $id"
+            )
+        }
     }
 
     override fun findWolfByName(name: String): Wolf {
@@ -75,6 +79,10 @@ class WolfServiceImpl(
 
     override fun deleteWolf(id: String) {
         repository.deleteById(id)
+    }
+
+    override fun deleteAllWolves() {
+        repository.deleteAll()
     }
 
 }

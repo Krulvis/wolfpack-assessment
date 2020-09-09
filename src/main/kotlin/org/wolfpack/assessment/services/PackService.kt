@@ -2,8 +2,8 @@ package org.wolfpack.assessment.services
 
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import org.wolfpack.assessment.Pack
-import org.wolfpack.assessment.Wolf
+import org.wolfpack.assessment.models.Pack
+import org.wolfpack.assessment.models.Wolf
 
 /**
  * Om ruimte over te laten voor business logic maak ik gebruik van services

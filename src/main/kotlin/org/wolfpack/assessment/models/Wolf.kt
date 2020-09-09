@@ -1,4 +1,4 @@
-package org.wolfpack.assessment
+package org.wolfpack.assessment.models
 
 import org.springframework.data.annotation.Id
 import org.springframework.data.geo.Point
@@ -13,13 +13,5 @@ class Wolf(
     var gender: String,
     var birthday: LocalDate,
     var location: Point?,
-    @Id var id: String? = null
-)
-
-@Document(collection = "packs")
-class Pack(
-    @Indexed(unique = true)
-    var name: String,
-    var wolves: Iterable<Wolf>,
     @Id var id: String? = null
 )
