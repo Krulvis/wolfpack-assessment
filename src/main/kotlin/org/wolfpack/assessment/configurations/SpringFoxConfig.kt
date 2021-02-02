@@ -15,7 +15,7 @@ class SpringFoxConfig {
     fun api(): Docket? {
         return Docket(DocumentationType.SWAGGER_2)
             .select()
-            .apis(RequestHandlerSelectors.any())
+            .apis(RequestHandlerSelectors.basePackage("org.wolfpack.assessment"))
             .paths(PathSelectors.any())
             .build()
     }

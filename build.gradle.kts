@@ -26,10 +26,9 @@ dependencies {
     implementation("org.springframework.boot", "spring-boot-starter-test")
     implementation("org.springframework.boot", "spring-boot-starter-web")
     implementation("org.springframework.boot", "spring-boot-starter-actuator")
+    implementation("org.springframework.boot", "spring-boot-starter-validation")
     implementation("org.springframework.boot", "spring-boot-starter-data-mongodb")
-    implementation("io.springfox", "springfox-swagger2", "3.0.0")
     implementation("io.springfox", "springfox-boot-starter", "3.0.0")
-    implementation("io.springfox", "springfox-swagger-ui", "3.0.0")
     testImplementation("com.ninja-squad:springmockk:2.0.3")
 }
 

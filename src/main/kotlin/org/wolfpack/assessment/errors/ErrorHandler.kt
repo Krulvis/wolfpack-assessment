@@ -1,18 +1,18 @@
 package org.wolfpack.assessment.errors
 
 import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
-import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.ResponseStatus
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.context.request.WebRequest
+import java.util.*
 
-@RestController
+@ResponseStatus(HttpStatus.NOT_FOUND)
+class RecordNotFoundException(message: String) : Exception(message)
+
+@ControllerAdvice
 class ErrorHandler {
-
-    @RequestMapping("/testError")
-    fun raiseError() {
-        throw IllegalArgumentException("This shouldn't have happened")
-    }
 
     @ExceptionHandler(IllegalArgumentException::class)
     @ResponseStatus(HttpStatus.CONFLICT)
@@ -21,7 +21,13 @@ class ErrorHandler {
     @ExceptionHandler(NotImplementedError::class)
     @ResponseStatus(HttpStatus.NOT_IMPLEMENTED)
     fun handleError(e: NotImplementedError) = e.message
-}
 
-@ResponseStatus
-class ResourceNotFoundException(message: String) : Exception(message)
+    @ExceptionHandler(RecordNotFoundException::class)
+    fun handleRecordNotFoundException(e: RecordNotFoundException, request: WebRequest?): ResponseEntity<Any?> {
+        val details: MutableList<String> = ArrayList()
+        details.add(e.localizedMessage)
+        val error = ErrorResponse("Record Not Found", details)
+        return ResponseEntity(error, HttpStatus.NOT_FOUND)
+    }
+
+}

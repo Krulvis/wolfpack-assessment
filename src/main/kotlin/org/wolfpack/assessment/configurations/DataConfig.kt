@@ -8,10 +8,12 @@ import org.wolfpack.assessment.models.Pack
 import org.wolfpack.assessment.PackRepository
 import org.wolfpack.assessment.models.Wolf
 import org.wolfpack.assessment.WolfRepository
+import org.wolfpack.assessment.models.Location
 import java.time.LocalDate
 
 @Configuration
 class DataConfig {
+
     @Bean
     fun databaseInitializer(
         wolfRepository: WolfRepository,
@@ -19,13 +21,13 @@ class DataConfig {
     ) = ApplicationRunner {
         wolfRepository.deleteAll()
         packRepository.deleteAll()
-        
+
         val joep = wolfRepository.save(
             Wolf(
                 "Joep Klein Teeselink",
                 "Male",
                 LocalDate.of(1994, 2, 5),
-                Point(0.0, 0.0)
+                Location(0.0, 0.0)
             )
         )
         val joch = wolfRepository.save(
@@ -33,7 +35,7 @@ class DataConfig {
                 "Joch Jansz",
                 "Male",
                 LocalDate.of(1993, 9, 14),
-                Point(0.0, 0.0)
+                Location(0.0, 0.0)
             )
         )
 
@@ -47,7 +49,7 @@ class DataConfig {
         packRepository.save(
             Pack(
                 name = "Running Pack",
-                wolves = listOf()
+                wolves = listOf(joch)
             )
         )
     }

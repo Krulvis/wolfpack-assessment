@@ -9,7 +9,7 @@ services:
       - MONGO_LOG_DIR=/dev/null
       - MONGO_INITDB_ROOT_USERNAME=root
       - MONGO_INITDB_ROOT_PASSWORD=secret
-      - MONGO_INITDB_DATABASE=wp_db
+      - MONGO_INITDB_DATABASE=wp-db
     ports:
       - 27017:27017
     volumes:

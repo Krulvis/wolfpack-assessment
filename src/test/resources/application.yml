@@ -1,6 +1,6 @@
 spring:
   data:
     mongodb:
-      uri: mongodb://root:secret@localhost:27017/admin
+      uri: mongodb://root:secret@localhost:27017/wp_db
 server:
   port: 8080

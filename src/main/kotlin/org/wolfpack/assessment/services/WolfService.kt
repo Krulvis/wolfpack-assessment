@@ -2,16 +2,18 @@ package org.wolfpack.assessment.services
 
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.Sort
-import org.springframework.data.geo.Point
 import org.springframework.data.mongodb.core.MongoTemplate
 import org.springframework.data.mongodb.core.query.Criteria
 import org.springframework.data.mongodb.core.query.Query
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import org.wolfpack.assessment.models.Wolf
 import org.wolfpack.assessment.WolfRepository
-import org.wolfpack.assessment.errors.ResourceNotFoundException
+import org.wolfpack.assessment.errors.RecordNotFoundException
+import org.wolfpack.assessment.models.Wolf
 
+/**
+ * Base Wolf service interface
+ */
 interface WolfService {
 
     fun getAllWolves(): Iterable<Wolf>
@@ -24,13 +26,16 @@ interface WolfService {
 
     fun findWolfByName(name: String): Wolf
 
-    fun updateLocationForId(id: String, point: Point)
-
     fun deleteWolf(id: String)
 
     fun deleteAllWolves()
+
 }
 
+/**
+ * Implementation of Wolf Service
+ * Uses AutoWired Mongo DAO [repository] to create, delete, find and update wolves in MongoDB
+ */
 @Service
 @Transactional
 class WolfServiceImpl(
@@ -38,49 +43,61 @@ class WolfServiceImpl(
     @Autowired private val mongoTemplate: MongoTemplate
 ) : WolfService {
 
+    /**
+     * Returns all wolves in db sorted by name
+     */
     override fun getAllWolves(): Iterable<Wolf> {
         return repository.findAll(Sort.by(Sort.Direction.ASC, "name"))
     }
 
+    /**
+     * Saves new [wolf]
+     */
     override fun createWolf(wolf: Wolf) {
+        println(wolf)
         repository.save(wolf)
     }
 
+    /**
+     * Stores [wolf] with [id] after deleting previous wolf with [id]
+     * Changes id of [wolf] to [id] to make sure that it gets stored under the provided [id]
+     */
     override fun updateWolf(id: String, wolf: Wolf) {
-        repository.findById(id).ifPresent {
-            it.birthday = wolf.birthday
-            it.name = wolf.name
-            it.gender = wolf.gender
-            it.location = wolf.location
-            repository.save(it)
-        }
+        wolf.id = id
+        repository.deleteById(id)
+        repository.save(wolf)
     }
 
+    /**
+     * Returns wolves that matches [id]
+     */
     override fun findWolfById(id: String): Wolf {
         return repository.findById(id).orElseThrow {
-            ResourceNotFoundException(
-                "Wolf not found for id: $id"
+            RecordNotFoundException(
+                "Can't find wolf for id: $id"
             )
         }
     }
 
+    /**
+     * Returns wolf for given [name]
+     */
     override fun findWolfByName(name: String): Wolf {
         val query = Query(Criteria.where("name").`is`(name))
         return mongoTemplate.findOne(query, Wolf::class.java)
-            ?: throw ResourceNotFoundException("Could not find wolf for name: $name")
+            ?: throw RecordNotFoundException("Can't find wolf for name: $name")
     }
 
-    override fun updateLocationForId(id: String, point: Point) {
-        repository.findById(id).ifPresent {
-            it.location = point
-            repository.save(it)
-        }
-    }
-
+    /**
+     * Deletes wolf for [id]
+     */
     override fun deleteWolf(id: String) {
         repository.deleteById(id)
     }
 
+    /**
+     * Deletes all wolves
+     */
     override fun deleteAllWolves() {
         repository.deleteAll()
     }

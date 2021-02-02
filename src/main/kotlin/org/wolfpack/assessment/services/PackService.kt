@@ -1,53 +1,86 @@
 package org.wolfpack.assessment.services
 
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import org.wolfpack.assessment.PackRepository
+import org.wolfpack.assessment.errors.RecordNotFoundException
 import org.wolfpack.assessment.models.Pack
 import org.wolfpack.assessment.models.Wolf
 
 /**
- * Om ruimte over te laten voor business logic maak ik gebruik van services
+ * To leave space for business logic im using services
  */
 interface PackService {
+
+
     fun findAllPacks(): Iterable<Pack>
 
     fun createPack(pack: Pack)
 
-    fun updatePack(pack: Pack)
+    fun updatePack(id: String, pack: Pack)
 
     fun findPackById(id: String)
 
-    fun findWolvesForId(id: String): Iterable<Wolf>
-
     fun deletePack(id: String)
+
+    fun findWolvesForId(id: String): Iterable<Wolf>
 }
 
 @Service
 @Transactional
-class PackServiceImpl : PackService {
+class PackServiceImpl(@Autowired private val repository: PackRepository) : PackService {
 
+    /**
+     * Returns all Packs
+     */
     override fun findAllPacks(): Iterable<Pack> {
-        TODO("Not yet implemented")
+        return repository.findAll(Sort.by(Sort.Direction.ASC, "name"))
     }
 
+    /**
+     * Creates a new pack
+     * [pack] should be a new Pack
+     */
     override fun createPack(pack: Pack) {
-        TODO("Not yet implemented")
+        repository.save(pack)
     }
 
-    override fun updatePack(pack: Pack) {
-        TODO("Not yet implemented")
+    /**
+     * Updates existing pack for [id]
+     * Changes [id] of [pack] and removes previous pack with [id]
+     */
+    override fun updatePack(id: String, pack: Pack) {
+        pack.id = id
+        repository.deleteById(id)
+        repository.save(pack)
     }
 
+    /**
+     * Returns a pack for given id
+     * [id] of pack to look for
+     */
     override fun findPackById(id: String) {
-        TODO("Not yet implemented")
+        repository.findById(id).orElseThrow {
+            RecordNotFoundException("Can't find pack for id: $id")
+        }
     }
 
-    override fun findWolvesForId(id: String): Iterable<Wolf> {
-        TODO("Not yet implemented")
-    }
-
+    /**
+     * Deletes pack with [id] if pack exists
+     */
     override fun deletePack(id: String) {
-        TODO("Not yet implemented")
+        repository.deleteById(id)
+    }
+
+    /**
+     * Returns all wolves in pack for [id]
+     */
+    override fun findWolvesForId(id: String): Iterable<Wolf> {
+        return repository.findById(id).orElseThrow {
+            RecordNotFoundException("Can't find pack for id: $id")
+        }.wolves
     }
 
 }
