@@ -42,14 +42,14 @@ class DataConfig {
         packRepository.save(
             Pack(
                 name = "Big Pack",
-                wolves = listOf(joep, joch)
+                wolves = mutableListOf(joep, joch)
             )
         )
 
         packRepository.save(
             Pack(
                 name = "Running Pack",
-                wolves = listOf(joch)
+                wolves = mutableListOf(joch)
             )
         )
     }

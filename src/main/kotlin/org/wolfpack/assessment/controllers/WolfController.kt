@@ -19,11 +19,8 @@ class WolfController(@Autowired private val service: WolfService) {
         ResponseEntity.ok(service.getAllWolves())
 
     @PostMapping("wolf/")
-    fun createOne(@Valid @RequestBody wolf: Wolf, bindingResult: BindingResult): ResponseEntity<String> {
-        println(bindingResult)
-        return ResponseEntity("Created wolf with id: ${service.createWolf(wolf)}", HttpStatus.CREATED)
-    }
-
+    fun createOne(@Valid @RequestBody wolf: Wolf, bindingResult: BindingResult): ResponseEntity<String> =
+        ResponseEntity("Created wolf with id: ${service.createWolf(wolf)}", HttpStatus.CREATED)
 
     @GetMapping("wolf/{id}")
     fun findOne(@PathVariable id: String): ResponseEntity<Wolf> =
@@ -34,8 +31,7 @@ class WolfController(@Autowired private val service: WolfService) {
         @PathVariable id: String,
         @Valid @RequestBody wolf: Wolf
     ): ResponseEntity<String> =
-        ResponseEntity("Updated wolf: ${service.updateWolf(id, wolf)}", HttpStatus.OK)
-
+        ResponseEntity.ok("Updated wolf for id: ${service.updateWolf(id, wolf)}")
 
     @DeleteMapping("wolf/{id}")
     fun deleteOne(@PathVariable id: String): ResponseEntity<String> {

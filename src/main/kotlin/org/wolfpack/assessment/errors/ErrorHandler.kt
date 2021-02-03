@@ -3,6 +3,7 @@ package org.wolfpack.assessment.errors
 import com.fasterxml.jackson.databind.JsonMappingException
 import com.fasterxml.jackson.databind.exc.InvalidFormatException
 import com.fasterxml.jackson.module.kotlin.MissingKotlinParameterException
+import org.springframework.dao.DuplicateKeyException
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -41,6 +42,16 @@ class ErrorHandler : ResponseEntityExceptionHandler() {
     }
 
     /**
+     * Error handler duplicate key is found
+     * This is thrown when adding a wolf to pack that already contains that Wolf
+     */
+    @ExceptionHandler(DuplicateKeyException::class)
+    fun handleDuplicateKeyError(e: DuplicateKeyException, request: WebRequest?): ResponseEntity<ErrorResponse> {
+        val error = ErrorResponse("Duplicate key error", e.localizedMessage)
+        return ResponseEntity(error, HttpStatus.BAD_REQUEST)
+    }
+
+    /**
      * Error handler when being unable to parse http message
      * I.e. request body validation error
      */
@@ -51,7 +62,6 @@ class ErrorHandler : ResponseEntityExceptionHandler() {
         request: WebRequest
     ): ResponseEntity<Any> {
         val cause = ex.cause
-        println(ex.message)
         when (cause) {
             is MissingKotlinParameterException -> {
                 /*
@@ -67,7 +77,7 @@ class ErrorHandler : ResponseEntityExceptionHandler() {
                 In this case the field is not parsable and we need to figure out what error to display
                  */
                 val name = getCorruptField(cause.path)
-                println("Found InvalidFormatException at: $name, value: ${cause.value}")
+//                println("Found InvalidFormatException at: $name, value: ${cause.value}")
                 val format = getCorrectFormat(cause.targetType.simpleName)
                 val error = ErrorResponse(
                     "Incorrect format for: [$name], correct format: \"${format}\"", ex.localizedMessage
@@ -96,7 +106,6 @@ class ErrorHandler : ResponseEntityExceptionHandler() {
      * Determines the correct format for requests with InvalidFormat error
      */
     fun getCorrectFormat(clazz: String): String {
-        println(clazz)
         when (clazz) {
             "LocalDate" -> {
                 return "1994-02-05"

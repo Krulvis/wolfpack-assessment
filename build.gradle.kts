@@ -23,13 +23,12 @@ dependencies {
     implementation("com.thedeanda", "lorem", "2.1")
     implementation("org.jetbrains.kotlin", "kotlin-reflect")
     implementation("com.fasterxml.jackson.module", "jackson-module-kotlin")
-    implementation("org.springframework.boot", "spring-boot-starter-test")
     implementation("org.springframework.boot", "spring-boot-starter-web")
     implementation("org.springframework.boot", "spring-boot-starter-actuator")
     implementation("org.springframework.boot", "spring-boot-starter-validation")
     implementation("org.springframework.boot", "spring-boot-starter-data-mongodb")
-//    implementation("org.springframework.boot", "spring-boot-starter-data-jpa")
     implementation("io.springfox", "springfox-boot-starter", "3.0.0")
+    testImplementation("org.springframework.boot", "spring-boot-starter-test")
     testImplementation("com.ninja-squad:springmockk:2.0.3")
 }
 
@@ -38,6 +37,8 @@ allOpen {
     annotation("javax.persistence.Embeddable")
     annotation("javax.persistence.MappedSuperclass")
 }
+
+
 
 tasks.withType<KotlinCompile> {
     kotlinOptions {
