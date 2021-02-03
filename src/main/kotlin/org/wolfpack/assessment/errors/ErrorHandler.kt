@@ -1,5 +1,7 @@
 package org.wolfpack.assessment.errors
 
+import com.fasterxml.jackson.databind.JsonMappingException
+import com.fasterxml.jackson.databind.exc.InvalidFormatException
 import com.fasterxml.jackson.module.kotlin.MissingKotlinParameterException
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
@@ -49,23 +51,59 @@ class ErrorHandler : ResponseEntityExceptionHandler() {
         request: WebRequest
     ): ResponseEntity<Any> {
         val cause = ex.cause
-        if (cause is MissingKotlinParameterException) {
-            /*
-            In this case we are dealing with missing parameters
-            so we display which parameter is missing
-             */
-            val name = cause.path.fold("") { jsonPath, ref ->
-                val suffix = when {
-                    ref.index > -1 -> "[${ref.index}]"
-                    else -> ".${ref.fieldName}"
-                }
-                (jsonPath + suffix).removePrefix(".")
+        println(ex.message)
+        when (cause) {
+            is MissingKotlinParameterException -> {
+                /*
+                In this case we are dealing with missing parameters
+                so we display which parameter is missing
+                 */
+                val name = getCorruptField(cause.path)
+                val error = ErrorResponse("[$name] must not be null", ex.localizedMessage)
+                return ResponseEntity(error, HttpStatus.BAD_REQUEST)
             }
-            val error = ErrorResponse("[$name] must not be null", ex.localizedMessage)
-            return ResponseEntity(error, HttpStatus.BAD_REQUEST)
+            is InvalidFormatException -> {
+                /*
+                In this case the field is not parsable and we need to figure out what error to display
+                 */
+                val name = getCorruptField(cause.path)
+                println("Found InvalidFormatException at: $name, value: ${cause.value}")
+                val format = getCorrectFormat(cause.targetType.simpleName)
+                val error = ErrorResponse(
+                    "Incorrect format for: [$name], correct format: \"${format}\"", ex.localizedMessage
+                )
+                return ResponseEntity(error, HttpStatus.BAD_REQUEST)
+            }
         }
         val error = ErrorResponse("Validation Error", ex.localizedMessage)
         return ResponseEntity(error, HttpStatus.BAD_REQUEST)
     }
+
+    /**
+     * Extracts the corrupt field from
+     */
+    fun getCorruptField(path: List<JsonMappingException.Reference>): String {
+        return path.fold("") { jsonPath, ref ->
+            val suffix = when {
+                ref.index > -1 -> "[${ref.index}]"
+                else -> ".${ref.fieldName}"
+            }
+            (jsonPath + suffix).removePrefix(".")
+        }
+    }
+
+    /**
+     * Determines the correct format for requests with InvalidFormat error
+     */
+    fun getCorrectFormat(clazz: String): String {
+        println(clazz)
+        when (clazz) {
+            "LocalDate" -> {
+                return "1994-02-05"
+            }
+        }
+        return "unknown"
+    }
+
 
 }
