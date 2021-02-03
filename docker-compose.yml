@@ -15,6 +15,12 @@ services:
     volumes:
       - mongo-data:/data/db
     command: mongod --smallfiles --logpath=/dev/null
-
+  wp-spring:
+    build: .
+    restart: always
+    ports:
+      - 8080:8080
+    links:
+      - wp-mongo:app_db
 volumes:
   mongo-data:
