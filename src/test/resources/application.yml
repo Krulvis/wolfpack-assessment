@@ -1,6 +1,9 @@
 spring:
   data:
     mongodb:
-      uri: mongodb://root:secret@localhost:27017/wp_db
+      uri: mongodb://root:secret@localhost:27017/wp-db?authSource=admin
 server:
   port: 8080
+  error:
+    include-binding-errors: always
+    include-message: always

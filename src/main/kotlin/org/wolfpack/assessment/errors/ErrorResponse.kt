@@ -11,5 +11,9 @@ import javax.xml.bind.annotation.XmlRootElement
 @XmlRootElement(name = "error")
 class ErrorResponse(
     val message: String,
-    val details: List<String>
-)
+    val details: String
+) {
+    override fun toString(): String {
+        return "Message: $message, details: $details"
+    }
+}

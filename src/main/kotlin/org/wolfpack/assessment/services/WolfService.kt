@@ -11,6 +11,7 @@ import org.wolfpack.assessment.WolfRepository
 import org.wolfpack.assessment.errors.RecordNotFoundException
 import org.wolfpack.assessment.models.Wolf
 
+
 /**
  * Base Wolf service interface
  */
@@ -18,9 +19,9 @@ interface WolfService {
 
     fun getAllWolves(): Iterable<Wolf>
 
-    fun createWolf(wolf: Wolf)
+    fun createWolf(wolf: Wolf): String
 
-    fun updateWolf(id: String, wolf: Wolf)
+    fun updateWolf(id: String, wolf: Wolf): String
 
     fun findWolfById(id: String): Wolf
 
@@ -53,19 +54,17 @@ class WolfServiceImpl(
     /**
      * Saves new [wolf]
      */
-    override fun createWolf(wolf: Wolf) {
-        println(wolf)
-        repository.save(wolf)
-    }
+    override fun createWolf(wolf: Wolf): String =
+        repository.save(wolf).id!!
 
     /**
      * Stores [wolf] with [id] after deleting previous wolf with [id]
      * Changes id of [wolf] to [id] to make sure that it gets stored under the provided [id]
      */
-    override fun updateWolf(id: String, wolf: Wolf) {
+    override fun updateWolf(id: String, wolf: Wolf): String {
         wolf.id = id
         repository.deleteById(id)
-        repository.save(wolf)
+        return repository.save(wolf).id!!
     }
 
     /**

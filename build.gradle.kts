@@ -28,6 +28,7 @@ dependencies {
     implementation("org.springframework.boot", "spring-boot-starter-actuator")
     implementation("org.springframework.boot", "spring-boot-starter-validation")
     implementation("org.springframework.boot", "spring-boot-starter-data-mongodb")
+//    implementation("org.springframework.boot", "spring-boot-starter-data-jpa")
     implementation("io.springfox", "springfox-boot-starter", "3.0.0")
     testImplementation("com.ninja-squad:springmockk:2.0.3")
 }
