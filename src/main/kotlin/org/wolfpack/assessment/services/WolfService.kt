@@ -60,6 +60,8 @@ class WolfServiceImpl(
     /**
      * Stores [wolf] with [id] after deleting previous wolf with [id]
      * Changes id of [wolf] to [id] to make sure that it gets stored under the provided [id]
+     *
+     * Wolf does not have to exist when updating. As long as the wolf is valid it will get added to the DB
      */
     override fun updateWolf(id: String, wolf: Wolf): String {
         wolf.id = id
@@ -88,9 +90,14 @@ class WolfServiceImpl(
     }
 
     /**
-     * Deletes wolf for [id]
+     * Deletes wolf for [id] wolf has to exist before being able to delete
      */
     override fun deleteWolf(id: String) {
+        repository.findById(id).orElseThrow {
+            RecordNotFoundException(
+                "Can't find wolf for id: $id"
+            )
+        }
         repository.deleteById(id)
     }
 

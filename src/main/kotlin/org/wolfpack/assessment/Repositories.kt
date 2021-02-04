@@ -6,7 +6,7 @@ import org.wolfpack.assessment.models.Wolf
 
 /**
  * Interfaces that are used as repositories
- * They can be empty since they are autowired
+ * They can be empty since they are autowired and created by Spring (Dependency injection)
  */
 interface PackRepository : MongoRepository<Pack, String>
 

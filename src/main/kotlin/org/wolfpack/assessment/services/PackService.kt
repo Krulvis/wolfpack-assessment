@@ -76,6 +76,7 @@ class PackServiceImpl(
 
     /**
      * Adds wolf for [wolfId] to pack for [packId]
+     * By making use of wolf service, we can be sure that an error gets thrown instead if the wolf does not exist
      */
     override fun addWolfToPack(packId: String, wolfId: String): String {
         val wolf = wolfService.findWolfById(wolfId)
@@ -101,6 +102,9 @@ class PackServiceImpl(
      * Deletes pack with [id] if pack exists
      */
     override fun deletePack(id: String) {
+        repository.findById(id).orElseThrow {
+            RecordNotFoundException("Can't find pack for id: $id")
+        }
         repository.deleteById(id)
     }
 
