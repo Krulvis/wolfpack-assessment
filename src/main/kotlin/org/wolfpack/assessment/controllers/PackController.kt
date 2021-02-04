@@ -9,6 +9,10 @@ import org.wolfpack.assessment.models.Wolf
 import org.wolfpack.assessment.services.PackService
 import javax.validation.Valid
 
+/**
+ * Since we use @Valid annotation for any of the routes that have a RequestBody,
+ * we can be sure that all services receive validated Packs&Wolfs
+ */
 @RestController
 @RequestMapping("/api/")
 class PackController(@Autowired private val service: PackService) {
@@ -39,7 +43,7 @@ class PackController(@Autowired private val service: PackService) {
     @DeleteMapping("pack/{id}")
     fun deleteOne(@PathVariable id: String): ResponseEntity<String> {
         service.deletePack(id)
-        return ResponseEntity.ok("Deleted pack")
+        return ResponseEntity.ok("Deleted pack for id: $id")
     }
 
     @GetMapping("pack/{id}/wolves")
