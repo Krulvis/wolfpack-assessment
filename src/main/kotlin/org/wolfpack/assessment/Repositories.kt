@@ -1,6 +1,7 @@
 package org.wolfpack.assessment
 
 import org.springframework.data.mongodb.repository.MongoRepository
+import org.springframework.data.mongodb.repository.Query
 import org.wolfpack.assessment.models.Pack
 import org.wolfpack.assessment.models.Wolf
 

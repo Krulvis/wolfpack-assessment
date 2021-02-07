@@ -2,6 +2,7 @@ spring:
   data:
     mongodb:
       uri: mongodb://root:secret@app_db:27017/wp-db?authSource=admin
+#      uri: mongodb://root:secret@localhost:27017/wp-db?authSource=admin
 server:
   port: 8080
   error:

@@ -1,14 +1,19 @@
 package org.wolfpack.assessment.services
 
+import org.bson.types.ObjectId
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.Sort
 import org.springframework.data.mongodb.core.MongoTemplate
+import org.springframework.data.mongodb.core.findById
 import org.springframework.data.mongodb.core.query.Criteria
 import org.springframework.data.mongodb.core.query.Query
+import org.springframework.data.mongodb.core.query.Update
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import org.wolfpack.assessment.PackRepository
 import org.wolfpack.assessment.WolfRepository
 import org.wolfpack.assessment.errors.RecordNotFoundException
+import org.wolfpack.assessment.models.Pack
 import org.wolfpack.assessment.models.Wolf
 
 
@@ -27,7 +32,7 @@ interface WolfService {
 
     fun findWolfByName(name: String): Wolf
 
-    fun deleteWolf(id: String)
+    fun deleteWolf(wolf: Wolf)
 
     fun deleteAllWolves()
 
@@ -41,6 +46,7 @@ interface WolfService {
 @Transactional
 class WolfServiceImpl(
     @Autowired private val repository: WolfRepository,
+    @Autowired private val packService: PackService,
     @Autowired private val mongoTemplate: MongoTemplate
 ) : WolfService {
 
@@ -90,15 +96,17 @@ class WolfServiceImpl(
     }
 
     /**
-     * Deletes wolf for [id] wolf has to exist before being able to delete
+     * Deletes [wolf] from collection
+     * Removes all references to [wolf] from Pack collection
      */
-    override fun deleteWolf(id: String) {
-        repository.findById(id).orElseThrow {
-            RecordNotFoundException(
-                "Can't find wolf for id: $id"
-            )
-        }
-        repository.deleteById(id)
+    override fun deleteWolf(wolf: Wolf) {
+        //Remove the wolf from all packs
+        val query = Query(Criteria.where("wolves.id").`is`(wolf.id!!))
+        val packs = mongoTemplate.find(query, Pack::class.java)
+        packs.forEach { packService.removeWolfFromPack(it, wolf) }
+
+        //Delete the wolf
+        repository.deleteById(wolf.id!!)
     }
 
     /**

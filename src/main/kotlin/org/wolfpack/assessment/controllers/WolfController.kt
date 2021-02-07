@@ -39,7 +39,8 @@ class WolfController(@Autowired private val service: WolfService) {
 
     @DeleteMapping("wolf/{id}")
     fun deleteOne(@PathVariable id: String): ResponseEntity<String> {
-        service.deleteWolf(id)
+        val wolf = service.findWolfById(id)
+        service.deleteWolf(wolf)
         return ResponseEntity.ok("Deleted wolf for id: $id")
     }
 

@@ -1,8 +1,12 @@
 package org.wolfpack.assessment.services
 
+import org.bson.types.ObjectId
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.dao.DuplicateKeyException
 import org.springframework.data.domain.Sort
+import org.springframework.data.mongodb.core.MongoTemplate
+import org.springframework.data.mongodb.core.query.Criteria
+import org.springframework.data.mongodb.core.query.Query
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.wolfpack.assessment.PackRepository
@@ -24,20 +28,20 @@ interface PackService {
 
     fun findPackById(id: String): Pack
 
-    fun addWolfToPack(packId: String, wolfId: String): String
+    fun addWolfToPack(pack: Pack, wolf: Wolf): String
 
-    fun removeWolfFromPack(packId: String, wolfId: String): String
+    fun removeWolfFromPack(pack: Pack, wolf: Wolf): String
 
     fun deletePack(id: String)
 
     fun findWolvesForPack(id: String): Iterable<Wolf>
+
 }
 
 @Service
 @Transactional
 class PackServiceImpl(
-    @Autowired private val repository: PackRepository,
-    @Autowired private val wolfService: WolfService
+    @Autowired private val repository: PackRepository
 ) : PackService {
 
     /**
@@ -75,27 +79,32 @@ class PackServiceImpl(
     }
 
     /**
-     * Adds wolf for [wolfId] to pack for [packId]
-     * By making use of wolf service, we can be sure that an error gets thrown instead if the wolf does not exist
+     * Adds wolf for [wolf] to [pack]
      */
-    override fun addWolfToPack(packId: String, wolfId: String): String {
-        val wolf = wolfService.findWolfById(wolfId)
-        val pack = findPackById(packId)
+    override fun addWolfToPack(pack: Pack, wolf: Wolf): String {
         if (pack.wolves.contains(wolf)) {
-            throw DuplicateKeyException("Wolf: $wolfId already in pack: $packId")
+            throw DuplicateKeyException("Wolf: ${wolf.id} already in pack: ${pack.id}")
         }
         pack.wolves.add(wolf)
-        return updatePack(packId, pack)
+        return updatePack(pack.id!!, pack)
     }
 
     /**
-     * Removes wolf for [wolfId] from pack for [packId]
+     * Removes [wolf] from [pack]
+     * If there are no more wolves in the pack
+     * (Criteria of Pack is that it has at least 1 wolf)
      */
-    override fun removeWolfFromPack(packId: String, wolfId: String): String {
-        val wolf = wolfService.findWolfById(wolfId)
-        val pack = findPackById(packId)
+    override fun removeWolfFromPack(pack: Pack, wolf: Wolf): String {
+        if (!pack.wolves.contains(wolf)) {
+            throw RecordNotFoundException("Wolf: ${wolf.id} not in pack: ${pack.id}")
+        }
         pack.wolves.remove(wolf)
-        return updatePack(packId, pack)
+        return if (pack.wolves.isEmpty()) {
+            deletePack(pack.id!!)
+            "Deleted pack: ${pack.id} since there are no wolves left"
+        } else {
+            updatePack(pack.id!!, pack)
+        }
     }
 
     /**

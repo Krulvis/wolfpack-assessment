@@ -100,7 +100,6 @@ class WolfControllerTest {
 
     @Test
     fun `Create pack without any wolves`() {
-        val wolf = wolfService.findWolfByName("TestUser")
         val pack = JSONObject(
             mapOf(
                 Pair("name", "NewPack")

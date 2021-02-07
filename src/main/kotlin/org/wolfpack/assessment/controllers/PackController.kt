@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*
 import org.wolfpack.assessment.models.Pack
 import org.wolfpack.assessment.models.Wolf
 import org.wolfpack.assessment.services.PackService
+import org.wolfpack.assessment.services.WolfService
 import javax.validation.Valid
 
 /**
@@ -15,40 +16,57 @@ import javax.validation.Valid
  */
 @RestController
 @RequestMapping("/api/")
-class PackController(@Autowired private val service: PackService) {
+class PackController(
+    @Autowired private val packService: PackService,
+    @Autowired private val wolfService: WolfService
+) {
 
     @GetMapping("packs/")
-    fun findAll(): ResponseEntity<Iterable<Pack>> = ResponseEntity.ok(service.findAllPacks())
+    fun findAll(): ResponseEntity<Iterable<Pack>> = ResponseEntity.ok(packService.findAllPacks())
 
     @PostMapping("pack/")
     fun createOne(@Valid @RequestBody pack: Pack): ResponseEntity<String> =
-        ResponseEntity("Created pack for id: ${service.createPack(pack)}", HttpStatus.CREATED)
+        ResponseEntity("Created pack for id: ${packService.createPack(pack)}", HttpStatus.CREATED)
 
     @GetMapping("pack/{id}")
     fun findOne(@PathVariable id: String): ResponseEntity<Pack> =
-        ResponseEntity.ok(service.findPackById(id))
+        ResponseEntity.ok(packService.findPackById(id))
 
     @PostMapping("pack/{packId}/addWolf/{wolfId}")
-    fun addWolf(@PathVariable packId: String, @PathVariable wolfId: String): ResponseEntity<String> =
-        ResponseEntity.ok("Added wolf with id: $wolfId to pack with id: $${service.addWolfToPack(packId, wolfId)}")
+    fun addWolf(@PathVariable packId: String, @PathVariable wolfId: String): ResponseEntity<String> {
+        val wolf = wolfService.findWolfById(wolfId)
+        val pack = packService.findPackById(packId)
+        return ResponseEntity.ok(
+            "Added wolf with id: $wolfId to pack with id: $${
+                packService.addWolfToPack(pack, wolf)
+            }"
+        )
+    }
 
     @PostMapping("pack/{packId}/removeWolf/{wolfId}")
-    fun removeWolf(@PathVariable packId: String, @PathVariable wolfId: String): ResponseEntity<String> =
-        ResponseEntity.ok("Added wolf with id: $wolfId to pack with id: $${service.removeWolfFromPack(packId, wolfId)}")
+    fun removeWolf(@PathVariable packId: String, @PathVariable wolfId: String): ResponseEntity<String> {
+        val wolf = wolfService.findWolfById(wolfId)
+        val pack = packService.findPackById(packId)
+        return ResponseEntity.ok(
+            "Removed wolf with id: $wolfId from pack with id: $${
+                packService.removeWolfFromPack(pack, wolf)
+            }"
+        )
+    }
 
     @PutMapping("pack/{id}")
     fun updateOne(@PathVariable id: String, @Valid @RequestBody pack: Pack): ResponseEntity<String> =
-        ResponseEntity.ok("Updated pack for id: ${service.updatePack(id, pack)}")
+        ResponseEntity.ok("Updated pack for id: ${packService.updatePack(id, pack)}")
 
     @DeleteMapping("pack/{id}")
     fun deleteOne(@PathVariable id: String): ResponseEntity<String> {
-        service.deletePack(id)
+        packService.deletePack(id)
         return ResponseEntity.ok("Deleted pack for id: $id")
     }
 
     @GetMapping("pack/{id}/wolves")
     fun getWolves(@PathVariable id: String): ResponseEntity<Iterable<Wolf>> =
-        ResponseEntity.ok(service.findWolvesForPack(id))
+        ResponseEntity.ok(packService.findWolvesForPack(id))
 
 
 }
